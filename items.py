@@ -10,6 +10,19 @@ if node.has_bundle("epel"):
 else:
     pkg_yum['fish'] = {}
 
+files = {
+    "/root/.config/fish/config.fish": {
+        'source': "config.fish",
+        'content_type': 'mako',
+        'mode': "0640",
+        'owner': "root",
+        'group': "root",
+        'needs': [
+            "pkg_yum:fish",
+        ],
+    },
+}
+
 actions = {
     'enable_fish': {
         'command': "chsh -s /usr/bin/fish root",
