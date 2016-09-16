@@ -10,6 +10,8 @@ if node.has_bundle("epel"):
 else:
     pkg_yum['fish'] = {}
 
+directories = {}
+
 files = {
     "/root/.config/fish/config.fish": {
         'source': "config.fish",
@@ -55,3 +57,63 @@ if node.metadata.get('fish', {}).get('install_fisherman', True):
                 "action:enable_fish",
             ],
         }
+
+for user in node.metadata.get('fish', {}).get('additional_users', {}):
+    directories['/home/{}/.config/fish'.format(user)] = {
+        'owner': user,
+        'group': user,
+        'needs': [
+            "pkg_yum:fish",
+        ],
+    }
+    files['/home/{}/.config/fish/config.fish'.format(user)] = {
+        'source': "config.fish",
+        'mode': "0640",
+        'owner': user,
+        'group': user,
+        'content_type': "mako",
+        'needs': [
+            "pkg_yum:fish",
+        ],
+    }
+
+    if node.metadata.get('fish', {}).get('install_fisherman', True):
+        directories['/home/{}/.config/fisherman'.format(user)] = {
+            'owner': user,
+            'group': user,
+            'needs': [
+                "pkg_yum:fish",
+            ],
+            'triggers': [
+                "action:install_fisherman_{}".format(user),
+            ],
+        }
+        for plugin in node.metadata.get('fish', {}).get('plugins', {}):
+            actions['install_fisherman_{}'.format(user)] = {
+                'command': "sudo -u {} fish -c \"curl -Lo /home/{}/.config/fish/functions/fisher.fish --create-dirs git.io/fisherman\"".format(user, user),
+                'unless': "test -f /home/{}/.config/fish/functions/fisher.fish".format(user),
+                'cascade_skip': False,
+                'triggered': True,
+                'needs': [
+                    "pkg_yum:fish",
+                    "pkg_yum:curl",
+                ],
+            }
+            actions['enable_fish_{}'.format(user)] = {
+                'command': "chsh -s /usr/bin/fish {}".format(user),
+                'unless': "getent passwd {} | cut -d: -f7 | grep /usr/bin/fish".format(user),
+                'cascade_skip': False,
+                'needs': [
+                    "pkg_yum:fish",
+                ],    
+            }
+            actions['fisher_{}_{}'.format(user, plugin)] = {
+                'command': "sudo -u {} fish -c \"fisher {}\"".format(user, plugin),
+                'unless': "grep {} /home/{}/.config/fish/fishfile".format(plugin, user),
+                'cascade_skip': False,
+                'needs': [
+                    "pkg_yum:fish",
+                    "action:install_fisherman_{}".format(user),
+                    "action:enable_fish_{}".format(user),
+                ],
+            }
