@@ -35,7 +35,7 @@ actions = {
 }
 
 if node.metadata.get('fish', {}).get('install_fisherman', True):
-    actions['install_fisher'] = {
+    actions['install_fisherman'] = {
         'command': "curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs git.io/fisherman",
         'unless': "test -f ~/.config/fish/functions/fisher.fish",
         'cascade_skip': False,
@@ -44,3 +44,14 @@ if node.metadata.get('fish', {}).get('install_fisherman', True):
             "pkg_yum:curl",
         ],
     }
+    for plugin in node.metadata.get('fish', {}).get('plugins', {}):
+        actions['fisher_{}'.format(plugin)] = {
+            'command': "sudo fish -c \"fisher {}\"".format(plugin),
+            'unless': "grep {} ~/.config/fish/fishfile".format(plugin),
+            'cascade_skip': False,
+            'needs': [
+                "pkg_yum:fish",
+                "action:install_fisherman",
+                "action:enable_fish",
+            ],
+        }
