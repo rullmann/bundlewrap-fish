@@ -85,7 +85,6 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
                 'command': "sudo -u {} fish -c \"curl -Lo /home/{}/.config/fish/functions/fisher.fish --create-dirs git.io/fisherman\"".format(user, user),
                 'unless': "test -f /home/{}/.config/fish/functions/fisher.fish".format(user),
                 'cascade_skip': False,
-                'triggered': True,
                 'needs': [
                     "pkg_yum:fish",
                     "pkg_yum:curl",
