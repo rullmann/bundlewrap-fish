@@ -76,9 +76,6 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
             'needs': [
                 "pkg_yum:fish",
             ],
-            'triggers': [
-                "action:install_fisherman_{}".format(user),
-            ],
         }
         for plugin in node.metadata.get('fish', {}).get('plugins', {}):
             actions['install_fisherman_{}'.format(user)] = {
