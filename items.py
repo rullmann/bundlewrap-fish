@@ -68,6 +68,14 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
             "pkg_yum:fish",
         ],
     }
+    actions['enable_fish_{}'.format(user)] = {
+        'command': "chsh -s /usr/bin/fish {}".format(user),
+        'unless': "getent passwd {} | cut -d: -f7 | grep /usr/bin/fish".format(user),
+        'cascade_skip': False,
+        'needs': [
+            "pkg_yum:fish",
+        ],
+    }
 
     if node.metadata.get('fish', {}).get('install_fisherman', True):
         directories['/home/{}/.config/fisherman'.format(user)] = {
@@ -77,6 +85,7 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
                 "pkg_yum:fish",
             ],
         }
+
         for plugin in node.metadata.get('fish', {}).get('plugins', {}):
             actions['install_fisherman_{}'.format(user)] = {
                 'command': "sudo -u {} fish -c \"curl -Lo /home/{}/.config/fish/functions/fisher.fish --create-dirs git.io/fisherman\"".format(user, user),
@@ -86,14 +95,6 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
                     "pkg_yum:fish",
                     "pkg_yum:curl",
                 ],
-            }
-            actions['enable_fish_{}'.format(user)] = {
-                'command': "chsh -s /usr/bin/fish {}".format(user),
-                'unless': "getent passwd {} | cut -d: -f7 | grep /usr/bin/fish".format(user),
-                'cascade_skip': False,
-                'needs': [
-                    "pkg_yum:fish",
-                ],    
             }
             actions['fisher_{}_{}'.format(user, plugin)] = {
                 'command': "sudo -u {} fish -c \"fisher {}\"".format(user, plugin),
