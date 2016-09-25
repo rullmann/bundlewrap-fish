@@ -106,3 +106,6 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
                     "action:enable_fish_{}".format(user),
                 ],
             }
+
+if node.has_bundle("docker"):
+    pkg_yum['docker-fish-completion'] = {}
