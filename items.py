@@ -1,4 +1,4 @@
-pkg_yum = {
+pkg_dnf = {
     'fish': {},
 }
 
@@ -12,7 +12,7 @@ files = {
         'owner': "root",
         'group': "root",
         'needs': [
-            "pkg_yum:fish",
+            "pkg_dnf:fish",
         ],
     },
 }
@@ -23,7 +23,7 @@ actions = {
         'unless': "getent passwd root | cut -d: -f7 | grep /usr/bin/fish",
         'cascade_skip': False,
         'needs': [
-            "pkg_yum:fish",
+            "pkg_dnf:fish",
         ],
     },
 }
@@ -34,8 +34,8 @@ if node.metadata.get('fish', {}).get('install_fisherman', True):
         'unless': "test -f ~/.config/fish/functions/fisher.fish",
         'cascade_skip': False,
         'needs': [
-            "pkg_yum:fish",
-            "pkg_yum:curl",
+            "pkg_dnf:fish",
+            "pkg_dnf:curl",
         ],
     }
     for plugin in node.metadata.get('fish', {}).get('plugins', {}):
@@ -44,7 +44,7 @@ if node.metadata.get('fish', {}).get('install_fisherman', True):
             'unless': "grep {} ~/.config/fish/fishfile".format(plugin),
             'cascade_skip': False,
             'needs': [
-                "pkg_yum:fish",
+                "pkg_dnf:fish",
                 "action:install_fisherman",
                 "action:enable_fish",
             ],
@@ -55,7 +55,7 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
         'owner': user,
         'group': user,
         'needs': [
-            "pkg_yum:fish",
+            "pkg_dnf:fish",
         ],
     }
     files['/home/{}/.config/fish/config.fish'.format(user)] = {
@@ -65,7 +65,7 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
         'group': user,
         'content_type': "mako",
         'needs': [
-            "pkg_yum:fish",
+            "pkg_dnf:fish",
         ],
     }
     actions['enable_fish_{}'.format(user)] = {
@@ -73,7 +73,7 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
         'unless': "getent passwd {} | cut -d: -f7 | grep /usr/bin/fish".format(user),
         'cascade_skip': False,
         'needs': [
-            "pkg_yum:fish",
+            "pkg_dnf:fish",
         ],
     }
 
@@ -82,7 +82,7 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
             'owner': user,
             'group': user,
             'needs': [
-                "pkg_yum:fish",
+                "pkg_dnf:fish",
             ],
         }
 
@@ -92,8 +92,8 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
                 'unless': "test -f /home/{}/.config/fish/functions/fisher.fish".format(user),
                 'cascade_skip': False,
                 'needs': [
-                    "pkg_yum:fish",
-                    "pkg_yum:curl",
+                    "pkg_dnf:fish",
+                    "pkg_dnf:curl",
                 ],
             }
             actions['fisher_{}_{}'.format(user, plugin)] = {
@@ -101,7 +101,7 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
                 'unless': "grep {} /home/{}/.config/fish/fishfile".format(plugin, user),
                 'cascade_skip': False,
                 'needs': [
-                    "pkg_yum:fish",
+                    "pkg_dnf:fish",
                     "action:install_fisherman_{}".format(user),
                     "action:enable_fish_{}".format(user),
                 ],
