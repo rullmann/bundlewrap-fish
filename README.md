@@ -2,15 +2,6 @@
 
 `bundlewrap-fish` will install and configure [fish shell](https://fishshell.com/) as well as [fisherman](http://fisherman.sh/), a package manager for fish.
 
-## Compatibility
-
-This bundle has been tested on the following systems:
-
-| OS          | `[x]` |
-| ----------- | ----- |
-| Fedora 24   | `[x]` |
-| Fedberry 23 | `[ ]` |
-
 ## Requirements
 
 * Bundles:
