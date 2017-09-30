@@ -9,8 +9,6 @@ files = {
         'source': "config.fish",
         'content_type': 'mako',
         'mode': "0640",
-        'owner': "root",
-        'group': "root",
         'needs': [
             "pkg_dnf:fish",
         ],
