@@ -18,7 +18,7 @@ actions = {
         'command': 'chsh -s /usr/bin/fish root',
         'unless': 'getent passwd root | cut -d: -f7 | grep /usr/bin/fish',
         'cascade_skip': False,
-        'needs': ['pkg_dnf:fish'],
+        'needs': ['pkg_dnf:fish', 'pkg_dnf:util-linux-user'],
     },
 }
 
@@ -55,7 +55,7 @@ for user in node.metadata.get('fish', {}).get('additional_users', {}):
         'command': 'chsh -s /usr/bin/fish {}'.format(user),
         'unless': 'getent passwd {} | cut -d: -f7 | grep /usr/bin/fish'.format(user),
         'cascade_skip': False,
-        'needs': ['pkg_dnf:fish'],
+        'needs': ['pkg_dnf:fish', 'pkg_dnf:util-linux-user'],
     }
 
     if node.metadata.get('fish', {}).get('install_fisherman', True):
